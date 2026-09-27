@@ -81,8 +81,42 @@ def _build_model_settings(config: Config, model_name: str) -> OpenAIChatModelSet
     provider default.
     """
     if _should_use_max_completion_tokens(model_name, config.llm_base_url):
-        return OpenAIChatModelSettings(max_completion_tokens=config.max_tokens)
-    return OpenAIChatModelSettings(max_tokens=config.max_tokens)
+        settings = OpenAIChatModelSettings(max_completion_tokens=config.max_tokens)
+    else:
+        settings = OpenAIChatModelSettings(max_tokens=config.max_tokens)
+
+    if getattr(config, "disable_reasoning", False) and _provider_supports_disable_reasoning(
+        getattr(config, "provider", "openai-compatible")
+    ):
+        settings["extra_body"] = _disable_reasoning_extra_body(settings.get("extra_body"))
+    return settings
+
+
+def _provider_supports_disable_reasoning(provider: str) -> bool:
+    """Return True if *provider* accepts the chat-template ``enable_thinking``
+    request parameter.
+
+    Only the generic ``openai-compatible`` provider is supported: it targets
+    self-hosted / local OpenAI-compatible servers (e.g. vLLM) whose chat
+    templates implement ``enable_thinking``. First-party APIs and other
+    providers do not accept this parameter and are excluded so we never inject
+    an unsupported field into their requests.
+    """
+    return provider == "openai-compatible"
+
+
+def _disable_reasoning_extra_body(existing_extra_body: dict | None) -> dict:
+    """Return an ``extra_body`` dict that requests non-reasoning generation.
+
+    Merges ``chat_template_kwargs.enable_thinking = False`` into *existing_extra_body*
+    without overwriting other keys. Existing ``chat_template_kwargs`` entries are
+    preserved; only ``enable_thinking`` is set/overridden.
+    """
+    extra_body = dict(existing_extra_body or {})
+    chat_template_kwargs = dict(extra_body.get("chat_template_kwargs") or {})
+    chat_template_kwargs["enable_thinking"] = False
+    extra_body["chat_template_kwargs"] = chat_template_kwargs
+    return extra_body
 
 
 def _get_litellm_model_name(model_name: str, provider: str) -> str:
@@ -351,6 +385,9 @@ def call_llm(prompt: str, config: Config, model: str = None) -> Optional[str]:
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
     }
+
+    if getattr(config, "disable_reasoning", False):
+        base_kwargs["extra_body"] = _disable_reasoning_extra_body(None)
 
     try:
         response = client.chat.completions.create(

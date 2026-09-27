@@ -131,7 +131,7 @@ class Configuration:
         max_token_per_leaf_module: Maximum tokens per leaf module (default: 16000)
         max_depth: Maximum depth for hierarchical decomposition (default: 2)
         use_gitignore: Apply Git ignore rules during repository analysis
-        prompt_caching: Add prompt-cache breakpoints to agentic LLM calls (default: True)
+        disable_reasoning: Request non-reasoning generation for compatible providers (default: False)
         agent_instructions: Custom agent instructions for documentation generation
     """
 
@@ -150,6 +150,7 @@ class Configuration:
     max_depth: int = 2
     use_gitignore: bool = True
     prompt_caching: bool = True
+    disable_reasoning: bool = False
     agent_instructions: AgentInstructions = field(default_factory=AgentInstructions)
 
     def validate(self):
@@ -189,6 +190,7 @@ class Configuration:
             "max_depth": self.max_depth,
             "use_gitignore": self.use_gitignore,
             "prompt_caching": self.prompt_caching,
+            "disable_reasoning": self.disable_reasoning,
             "fallback_model": self.fallback_model,
         }
         if self.agent_instructions and not self.agent_instructions.is_empty():
@@ -226,6 +228,7 @@ class Configuration:
             max_depth=data.get("max_depth", 2),
             use_gitignore=data.get("use_gitignore", True),
             prompt_caching=data.get("prompt_caching", True),
+            disable_reasoning=data.get("disable_reasoning", False),
             agent_instructions=agent_instructions,
         )
 
@@ -303,4 +306,5 @@ class Configuration:
             agent_instructions=final_instructions.to_dict() if final_instructions else None,
             use_gitignore=self.use_gitignore,
             prompt_caching=self.prompt_caching,
+            disable_reasoning=self.disable_reasoning,
         )

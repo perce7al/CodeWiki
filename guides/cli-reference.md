@@ -32,6 +32,7 @@ the repository first.
 | `--no-cache` | off | Ignore cached results and rebuild everything |
 | `--verbose`, `-v` | off | Show progress details and debug output |
 | `--prompt-caching` / `--no-prompt-caching` | enabled | Add prompt-cache breakpoints to agent calls. Falls back to normal calls if the provider rejects them |
+| `--disable-reasoning` / `--enable-reasoning` | disabled | Disable reasoning for compatible models. For compatible OpenAI-compatible backends, this requests non-reasoning generation by setting `enable_thinking=false` in the chat template kwargs |
 
 ### What gets analyzed
 
@@ -136,6 +137,7 @@ keys you pass are changed. Provider examples are in [Providers](providers.md).
 | `--max-tokens N`, `--max-token-per-module N`, `--max-token-per-leaf-module N`, `--max-depth N` | Stored token limits, see the table above |
 | `--use-gitignore` / `--no-gitignore` | Stored default for Git ignore handling |
 | `--prompt-caching` / `--no-prompt-caching` | Stored default for prompt caching |
+| `--disable-reasoning` / `--enable-reasoning` | Stored default for disabling model reasoning |
 
 Where things are stored:
 

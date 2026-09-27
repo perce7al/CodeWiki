@@ -94,6 +94,9 @@ class Config:
     # Prompt caching for agentic/multi-turn calls (auto-disables per model if
     # the provider rejects cache_control markers)
     prompt_caching: bool = True
+    # Request non-reasoning generation from compatible OpenAI-compatible
+    # backends (sets chat_template_kwargs.enable_thinking=false). Opt-in.
+    disable_reasoning: bool = False
     # Agent instructions for customization
     agent_instructions: dict[str, Any] | None = None
     # Apply Git ignore rules before dependency analysis
@@ -220,6 +223,7 @@ class Config:
         agent_instructions: dict[str, Any] | None = None,
         use_gitignore: bool = True,
         prompt_caching: bool = True,
+        disable_reasoning: bool = False,
         artifacts_enabled: bool = True,
         artifact_token_budget: int = DEFAULT_ARTIFACT_TOKEN_BUDGET,
         with_prose: bool = False,
@@ -284,6 +288,7 @@ class Config:
             agent_instructions=agent_instructions,
             use_gitignore=use_gitignore,
             prompt_caching=prompt_caching,
+            disable_reasoning=disable_reasoning,
             artifacts_enabled=artifacts_enabled,
             artifact_token_budget=artifact_token_budget,
             with_prose=with_prose,

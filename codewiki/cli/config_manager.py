@@ -142,6 +142,7 @@ class ConfigManager:
         azure_deployment: Optional[str] = None,
         use_gitignore: Optional[bool] = None,
         prompt_caching: Optional[bool] = None,
+        disable_reasoning: Optional[bool] = None,
     ):
         """
         Save configuration to file and keyring.
@@ -217,6 +218,8 @@ class ConfigManager:
             self._config.use_gitignore = use_gitignore
         if prompt_caching is not None:
             self._config.prompt_caching = prompt_caching
+        if disable_reasoning is not None:
+            self._config.disable_reasoning = disable_reasoning
 
         # Validate configuration whenever the minimum required fields are set.
         # Caw providers only need main_model; API providers need base_url +

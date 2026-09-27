@@ -537,6 +537,7 @@ async def _legacy_generate_docs(arguments: dict[str, Any]) -> list[TextContent]:
         max_tokens=config.max_tokens,
         agent_instructions=agent_instructions or None,
         use_gitignore=arguments.get("use_gitignore", True),
+        disable_reasoning=getattr(config, "disable_reasoning", False),
     )
 
     from codewiki.cli.utils.repo_validator import get_git_commit_hash

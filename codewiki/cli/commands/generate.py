@@ -303,6 +303,11 @@ def _invalidate_affected_modules(output_dir: Path, changed_files: list[str], log
     "normal calls if the provider rejects them (default: enabled)",
 )
 @click.option(
+    "--disable-reasoning/--enable-reasoning",
+    default=None,
+    help="Disable reasoning for compatible models (default: disabled)",
+)
+@click.option(
     "--artifacts/--no-artifacts",
     default=True,
     help="Document build, CI, container, packaging, manifest, config, schema and "
@@ -399,6 +404,7 @@ def generate_command(
     max_token_per_leaf_module: int | None,
     max_depth: int | None,
     prompt_caching: bool | None,
+    disable_reasoning: bool | None,
     artifacts: bool = True,
     artifact_token_budget: int = 200_000,
     with_prose: bool = False,
@@ -725,6 +731,10 @@ def generate_command(
                 "prompt_caching": prompt_caching
                 if prompt_caching is not None
                 else config.prompt_caching,
+                # Disable reasoning setting (runtime override takes precedence)
+                "disable_reasoning": disable_reasoning
+                if disable_reasoning is not None
+                else config.disable_reasoning,
                 # Artifact-aware generation (runtime-only flags)
                 "artifacts_enabled": artifacts,
                 "artifact_token_budget": artifact_token_budget,

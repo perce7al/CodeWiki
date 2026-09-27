@@ -148,6 +148,7 @@ class CLIDocumentationGenerator:
                 agent_instructions=self.config.get("agent_instructions"),
                 use_gitignore=self.config.get("use_gitignore", True),
                 prompt_caching=self.config.get("prompt_caching", True),
+                disable_reasoning=self.config.get("disable_reasoning", False),
                 artifacts_enabled=self.config.get("artifacts_enabled", True),
                 artifact_token_budget=self.config.get("artifact_token_budget", 200_000),
                 with_prose=self.config.get("with_prose", False),

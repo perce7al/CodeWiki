@@ -87,6 +87,11 @@ def config_group():
     help="Add prompt-cache breakpoints to agentic LLM calls; auto-falls back to "
     "normal calls if the provider rejects them (default: enabled)",
 )
+@click.option(
+    "--disable-reasoning/--enable-reasoning",
+    default=None,
+    help="Disable reasoning for compatible models (default: disabled)",
+)
 def config_set(
     api_key: Optional[str],
     base_url: Optional[str],
@@ -103,6 +108,7 @@ def config_set(
     azure_deployment: Optional[str] = None,
     use_gitignore: Optional[bool] = None,
     prompt_caching: Optional[bool] = None,
+    disable_reasoning: Optional[bool] = None,
 ):
     """
     Set configuration values for CodeWiki.
@@ -172,6 +178,7 @@ def config_set(
                 azure_deployment,
                 use_gitignore is not None,
                 prompt_caching is not None,
+                disable_reasoning is not None,
             ]
         ):
             click.echo("No options provided. Use --help for usage information.")
@@ -244,6 +251,9 @@ def config_set(
         if prompt_caching is not None:
             validated_data["prompt_caching"] = prompt_caching
 
+        if disable_reasoning is not None:
+            validated_data["disable_reasoning"] = disable_reasoning
+
         # Create config manager and save
         manager = ConfigManager()
         manager.load()  # Load existing config if present
@@ -264,6 +274,7 @@ def config_set(
             azure_deployment=validated_data.get("azure_deployment"),
             use_gitignore=validated_data.get("use_gitignore"),
             prompt_caching=validated_data.get("prompt_caching"),
+            disable_reasoning=validated_data.get("disable_reasoning"),
         )
 
         # Display success messages
@@ -329,6 +340,9 @@ def config_set(
         if prompt_caching is not None:
             click.secho(f"✓ Prompt caching: {prompt_caching}", fg="green")
 
+        if disable_reasoning is not None:
+            click.secho(f"✓ Disable reasoning: {disable_reasoning}", fg="green")
+
         click.echo("\n" + click.style("Configuration updated successfully.", fg="green", bold=True))
 
     except ConfigurationError as e:
@@ -386,6 +400,7 @@ def config_show(output_json: bool):
                 "max_depth": config.max_depth if config else 2,
                 "use_gitignore": config.use_gitignore if config else True,
                 "prompt_caching": config.prompt_caching if config else True,
+                "disable_reasoning": config.disable_reasoning if config else False,
                 "agent_instructions": config.agent_instructions.to_dict()
                 if config and config.agent_instructions
                 else {},
@@ -445,6 +460,7 @@ def config_show(output_json: bool):
                 click.echo(f"  Max Token/Module:        {config.max_token_per_module}")
                 click.echo(f"  Max Token/Leaf Module:   {config.max_token_per_leaf_module}")
                 click.echo(f"  Prompt Caching:          {config.prompt_caching}")
+                click.echo(f"  Disable Reasoning:       {config.disable_reasoning}")
 
             click.echo()
             click.secho("Decomposition Settings", fg="cyan", bold=True)
